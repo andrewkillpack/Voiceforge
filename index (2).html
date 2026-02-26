@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VoiceForge</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: #0a0a0a; color: #f0ede8; font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+body { display: flex; flex-direction: column; align-items: center; padding: 60px 20px 80px; }
+.wrap { width: 100%; max-width: 680px; }
+.logo { font-family: 'Bebas Neue', sans-serif; font-size: 3rem; letter-spacing: 0.06em; line-height: 1; color: #f0ede8; margin-bottom: 6px; }
+.logo span { color: #ff4d00; }
+.tagline { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: #555; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 48px; }
+.card { background: #111; border: 1px solid #222; padding: 32px; margin-bottom: 14px; position: relative; }
+.card::before { content: ''; position: absolute; top: -1px; left: -1px; width: 14px; height: 14px; border-top: 2px solid #ff4d00; border-left: 2px solid #ff4d00; }
+.clabel { font-family: 'DM Mono', monospace; font-size: 0.63rem; letter-spacing: 0.2em; text-transform: uppercase; color: #ff4d00; margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
+.clabel::after { content: ''; flex: 1; height: 1px; background: #222; }
+.clabel .n { color: #444; }
+.opt { font-family: 'DM Mono', monospace; font-size: 0.58rem; letter-spacing: 0.12em; color: #444; border: 1px solid #333; padding: 2px 6px; text-transform: uppercase; margin-left: 6px; }
+.flabel { display: block; font-size: 0.8rem; color: #777; margin-bottom: 10px; font-weight: 300; }
+input[type=text], input[type=number], textarea { background: #0a0a0a; border: 1px solid #2a2a2a; color: #f0ede8; font-family: 'DM Mono', monospace; font-size: 0.86rem; padding: 13px 15px; outline: none; width: 100%; transition: border-color 0.2s; }
+input[type=text]:focus, input[type=number]:focus, textarea:focus { border-color: #ff4d00; }
+input[type=number] { width: 150px; }
+textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
+.dur-row { display: flex; align-items: center; gap: 12px; }
+.dur-unit { font-family: 'DM Mono', monospace; font-size: 0.75rem; color: #444; letter-spacing: 0.1em; }
+.cb-row { display: flex; align-items: center; gap: 12px; cursor: pointer; user-select: none; }
+.cb-box { width: 22px; height: 22px; border: 1px solid #2a2a2a; background: #0a0a0a; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; }
+.cb-box:hover { border-color: #ff4d00; }
+.cb-box.on { background: #ff4d00; border-color: #ff4d00; }
+.cb-box.on::after { content: ''; width: 5px; height: 10px; border-right: 2px solid #fff; border-bottom: 2px solid #fff; transform: rotate(45deg) translate(-1px, -1px); display: block; }
+.cb-text { font-size: 0.86rem; color: #f0ede8; font-weight: 300; }
+.cb-text em { color: #ff4d00; font-style: normal; font-weight: 500; }
+.cb-note { margin-top: 9px; font-family: 'DM Mono', monospace; font-size: 0.65rem; color: #444; padding-left: 34px; line-height: 1.5; }
+.btn { width: 100%; background: #ff4d00; color: #fff; border: none; font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; letter-spacing: 0.12em; padding: 20px; cursor: pointer; transition: background 0.2s; margin-top: 6px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+.btn:hover { background: #ff7030; }
+.btn:disabled { background: #1e0f00; color: #ff4d00; cursor: not-allowed; }
+.spin { width: 17px; height: 17px; border: 2px solid #ff4d00; border-top-color: transparent; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.err { background: #1a0a0a; border: 1px solid #3d1212; padding: 18px 22px; margin-top: 8px; font-family: 'DM Mono', monospace; font-size: 0.78rem; color: #f44336; display: none; }
+.err.show { display: block; }
+.out { background: #0c180a; border: 1px solid #1a3d12; padding: 32px; margin-top: 8px; position: relative; display: none; }
+.out.show { display: block; animation: fadeup 0.35s ease; }
+.out::before { content: ''; position: absolute; top: -1px; left: -1px; width: 14px; height: 14px; border-top: 2px solid #4caf50; border-left: 2px solid #4caf50; }
+@keyframes fadeup { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+.out-hdr { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 18px; }
+.out-lbl { font-family: 'DM Mono', monospace; font-size: 0.63rem; letter-spacing: 0.2em; text-transform: uppercase; color: #4caf50; }
+.copy-btn { background: none; border: 1px solid #1a3d12; color: #4caf50; font-family: 'DM Mono', monospace; font-size: 0.63rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 5px 11px; cursor: pointer; transition: background 0.2s; }
+.copy-btn:hover { background: #1a3d12; }
+.out-text { font-family: 'DM Sans', sans-serif; font-size: 1rem; line-height: 1.85; color: #f0ede8; font-weight: 300; white-space: pre-wrap; }
+.out-meta { margin-top: 18px; padding-top: 14px; border-top: 1px solid #1a3d12; display: flex; gap: 22px; flex-wrap: wrap; }
+.meta { font-family: 'DM Mono', monospace; font-size: 0.66rem; color: #4caf50; letter-spacing: 0.08em; }
+.meta span { color: #444; margin-right: 5px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">Voice<span>Forge</span></div>
+  <div class="tagline">Amazon Product Review — Voiceover Script</div>
+  <div class="card">
+    <div class="clabel"><span class="n">01</span> Product Link</div>
+    <label class="flabel">Paste the Amazon product URL</label>
+    <input type="text" id="url" placeholder="https://www.amazon.com/dp/..." autocomplete="off" spellcheck="false">
+  </div>
+  <div class="card">
+    <div class="clabel"><span class="n">02</span> Duration</div>
+    <label class="flabel">Target voiceover length</label>
+    <div class="dur-row">
+      <input type="number" id="dur" value="30" min="5" max="300">
+      <span class="dur-unit">SECONDS</span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="clabel"><span class="n">03</span> Disclosure</div>
+    <div class="cb-row" onclick="toggleGifted()">
+      <div class="cb-box" id="cbbox"></div>
+      <span class="cb-text">This product was <em>gifted to me</em></span>
+    </div>
+    <div class="cb-note">When checked, your script will open with a natural gifted disclosure per FTC guidelines.</div>
+  </div>
+  <div class="card">
+    <div class="clabel"><span class="n">04</span> Notes <span class="opt">Optional</span></div>
+    <label class="flabel">Any specific details, tone, or things to highlight</label>
+    <textarea id="notes" placeholder="e.g. Emphasize the warranty, great for families, upbeat tone..."></textarea>
+  </div>
+  <button class="btn" id="btn" onclick="generate()">
+    <div class="spin" id="spin"></div>
+    <span id="btntxt">GENERATE VOICEOVER</span>
+  </button>
+  <div class="err" id="err"></div>
+  <div class="out" id="out">
+    <div class="out-hdr">
+      <div class="out-lbl">Generated Voiceover</div>
+      <button class="copy-btn" id="copybtn" onclick="copyIt()">Copy Script</button>
+    </div>
+    <div class="out-text" id="outtxt"></div>
+    <div class="out-meta">
+      <div class="meta"><span>WORDS</span><span id="mwords"></span></div>
+      <div class="meta"><span>TARGET</span><span id="mtarget"></span></div>
+      <div class="meta"><span>EST. DURATION</span><span id="mest"></span></div>
+    </div>
+  </div>
+</div>
+<script>
+var gifted = false;
+function toggleGifted() {
+  gifted = !gifted;
+  document.getElementById('cbbox').className = gifted ? 'cb-box on' : 'cb-box';
+}
+function showErr(msg) {
+  var el = document.getElementById('err');
+  el.textContent = 'Error: ' + msg;
+  el.className = 'err show';
+}
+function copyIt() {
+  var text = document.getElementById('outtxt').textContent;
+  navigator.clipboard.writeText(text).then(function() {
+    var b = document.getElementById('copybtn');
+    b.textContent = 'Copied!';
+    setTimeout(function() { b.textContent = 'Copy Script'; }, 2000);
+  });
+}
+document.getElementById('url').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') generate();
+});
+async function generate() {
+  var url = document.getElementById('url').value.trim();
+  var dur = document.getElementById('dur').value.trim();
+  var notes = document.getElementById('notes').value.trim();
+  var btn = document.getElementById('btn');
+  document.getElementById('err').className = 'err';
+  document.getElementById('out').className = 'out';
+  if (!url) return showErr('Please enter an Amazon product URL.');
+  if (!url.includes('amazon')) return showErr('URL does not appear to be an Amazon link.');
+  if (!dur || isNaN(dur) || parseInt(dur) < 5) return showErr('Please enter a valid duration (minimum 5 seconds).');
+  btn.disabled = true;
+  document.getElementById('btntxt').textContent = 'GENERATING...';
+  document.getElementById('spin').style.display = 'block';
+  try {
+    var secs = parseInt(dur);
+    var wTarget = Math.round((secs / 60) * 150);
+    var notesBlock = notes ? '\n\nExtra details to include:\n' + notes : '';
+    var giftedRule = gifted
+      ? 'Open with "I was gifted this [Product Name]" then jump straight into personal experience'
+      : 'Open by jumping straight into your personal experience with the product';
+    var prompt = 'You write product review voiceover scripts in a very specific personal style. Study this real example to understand the voice and structure to replicate:\n\nEXAMPLE (copy the STYLE only, not the content):\n"I was gifted this KitchenStar 16-inch Pizza Stone, and I finally tried it out with our go-to homemade pizza recipe. I was honestly pleasantly surprised! The crust came out nice and crisp on the bottom, but still soft on the inside - exactly how we like it. It\'s 5/8-inch thick natural cordierite and heat resistant up to 1800 degrees, so it works great in the oven or on the grill. I also love that it has handles, plus it comes with a stainless steel rack and a scraper tool for easy cleanup. Just make sure to read the instructions before using so you prep and heat it properly. Definitely a solid addition to our pizza nights!"\n\nSTYLE RULES:\n1. ' + giftedRule + '\n2. Use I, we, our - real person talking to a friend\n3. Genuine slightly-surprised reaction\n4. Sensory and practical descriptions, no marketing language\n5. Weave in 2-3 product specs naturally mid-sentence\n6. One "I also love that..." moment\n7. One practical tip near the end\n8. Warm low-key close, no big CTA\n9. Short to medium sentences, conversational rhythm\n10. Sound like someone talking not reading\n\nProduct URL: ' + url + '\nTarget: ' + secs + ' seconds (~' + wTarget + ' words at 150wpm)\n' + notesBlock + '\n\nUse placeholders like [Product Name] if needed. Script must be EXACTLY ' + wTarget + ' words. Write ONLY the spoken words, no labels or formatting.';
+    var res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, messages: [{ role: 'user', content: prompt }] })
+    });
+    var data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    var script = data.content && data.content[0] && data.content[0].text ? data.content[0].text.trim() : '';
+    if (!script) throw new Error('No script was generated.');
+    var wc = script.split(/\s+/).filter(function(w) { return w.length > 0; }).length;
+    var est = Math.round((wc / 150) * 60);
+    document.getElementById('outtxt').textContent = script;
+    document.getElementById('mwords').textContent = wc + ' / ' + wTarget + ' target';
+    document.getElementById('mtarget').textContent = secs + 's';
+    document.getElementById('mest').textContent = est + 's';
+    document.getElementById('out').className = 'out show';
+    document.getElementById('out').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } catch(e) {
+    showErr(e.message);
+  } finally {
+    btn.disabled = false;
+    document.getElementById('btntxt').textContent = 'GENERATE VOICEOVER';
+    document.getElementById('spin').style.display = 'none';
+  }
+}
+</script>
+</body>
+</html>
